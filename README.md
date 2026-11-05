@@ -1,59 +1,235 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ragen Swim Course
+### Swimming Course Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A web-based swimming course management system built to support daily operational activities, customer management, class scheduling, bookings, payments, and attendance tracking.
 
-## About Laravel
+Developed using Laravel with a focus on reliable business workflows, database integrity, and operational efficiency.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Project Overview
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Ragen Swim Course is a swimming course management platform designed to connect administrators, coaches, and customers through an integrated web application.
 
-## Learning Laravel
+The system provides tools to manage class schedules, participant packages, bookings, attendance, and other essential operational processes.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Core Features
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Booking Management
+- Customer class booking.
+- Booking confirmation and cancellation.
+- Booking rescheduling.
+- Schedule capacity validation.
+- Booking status management.
+- Prevention of duplicate session deductions.
 
-## Laravel Sponsors
+### 2. Waiting List System
+- Automatic waiting list creation.
+- Waiting list offer management.
+- Offer expiration handling.
+- Upcoming schedule monitoring.
+- Capacity validation when offering available slots.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Class Schedule Management
+- Create, update, and manage class schedules.
+- Weekly recurring schedule management.
+- Automatic weekly schedule generation.
+- Schedule cancellation and completion.
+- Class capacity validation.
 
-### Premium Partners
+### 4. Attendance Management
+- Coach attendance recording.
+- Participant package validation.
+- Automatic session deduction.
+- Booking completion management.
+- Transaction-safe attendance processing.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 5. Package Management
+- Participant package management.
+- Active package monitoring.
+- Used and remaining session tracking.
+- Package and order integration.
 
-## Contributing
+### 6. Operational Management
+- Customer and participant management.
+- Coach management.
+- Program and location management.
+- Order and payment management.
+- Invoice management.
+- Reports and dashboard.
+- Website content management.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## User Roles
 
-## Code of Conduct
+| Role | Responsibilities |
+|---|---|
+| Administrator | Manages operational activities, schedules, customers, coaches, orders, and reports. |
+| Customer | Manages participants, packages, bookings, and personal information. |
+| Coach | Views schedules, manages attendance, and records participant progress. |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Technical Stack
 
-## Security Vulnerabilities
+| Technology | Usage |
+|---|---|
+| PHP 8.2 | Backend programming |
+| Laravel 12 | Web application framework |
+| MariaDB / MySQL | Relational database |
+| Blade | Server-side templating |
+| JavaScript | Frontend interactions |
+| CSS | Interface styling |
+| Vite | Asset bundling |
+| PHPUnit | Automated testing |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Technical Implementation
 
-## License
+This project includes several backend implementation approaches to maintain data consistency and reliable operational workflows.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Database Transactions**
+- Transaction-based booking operations.
+- Consistent attendance processing.
+- Atomic session deduction.
+
+**Concurrency Control**
+- Pessimistic row locking using `lockForUpdate()`.
+- Schedule capacity protection.
+- Participant and package data protection.
+- Transaction-safe waiting list operations.
+
+**Business Logic Validation**
+- Booking status validation.
+- Package eligibility validation.
+- Schedule availability checks.
+- Duplicate session deduction prevention.
+- Waiting list offer expiration handling.
+
+## Testing
+
+Feature tests are implemented to validate important application workflows.
+
+The following core test suites have been executed successfully using MySQL:
+
+| Test Suite | Tests | Assertions |
+|---|---:|---:|
+| Booking Flow | 11 | 34 |
+| Waiting List Flow | 5 | 14 |
+| Attendance Flow | 5 | 26 |
+| **Total** | **21** | **74** |
+
+Run the core feature tests:
+
+```bash
+vendor/bin/phpunit \
+tests/Feature/BookingFlowTest.php \
+tests/Feature/WaitingListFlowTest.php \
+tests/Feature/AttendanceFlowTest.php \
+--no-progress
+```
+
+## Project Structure
+
+```text
+ragen-swim-course/
+├── app/
+│   ├── Console/
+│   ├── Http/
+│   │   └── Controllers/
+│   │       ├── Admin/
+│   │       ├── Coach/
+│   │       └── Customer/
+│   ├── Models/
+│   ├── Providers/
+│   └── Services/
+├── bootstrap/
+├── config/
+├── database/
+│   ├── factories/
+│   ├── migrations/
+│   └── seeders/
+├── public/
+├── resources/
+│   ├── css/
+│   ├── js/
+│   └── views/
+├── routes/
+├── storage/
+└── tests/
+    ├── Feature/
+    └── Unit/
+```
+
+## Installation
+
+### Requirements
+- PHP 8.2 or later
+- Composer
+- MySQL or MariaDB
+- Node.js and npm
+
+### Setup Instructions
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/NyxAkmall/ragen-swim-course.git
+
+cd ragen-swim-course
+```
+
+**2. Install PHP dependencies**
+
+```bash
+composer install
+```
+
+**3. Configure environment**
+
+```bash
+cp .env.example .env
+```
+
+Configure the database credentials in the `.env` file.
+
+**4. Generate application key**
+
+```bash
+php artisan key:generate
+```
+
+**5. Run database migrations**
+
+```bash
+php artisan migrate --seed
+```
+
+**6. Install frontend dependencies**
+
+```bash
+npm install
+npm run build
+```
+
+**7. Start the development server**
+
+```bash
+php artisan serve
+```
+
+Open `http://127.0.0.1:8000` in your browser.
+
+## Development Notes
+
+- Environment credentials must be configured locally.
+- Never commit `.env` files or production credentials.
+- Database migrations should be reviewed before deployment.
+- Production deployment requires appropriate server and database configuration.
+
+## Project Information
+
+**Project:** Ragen Swim Course
+**Repository:** [NyxAkmall/ragen-swim-course](https://github.com/NyxAkmall/ragen-swim-course)
+**Framework:** Laravel 12
+**Project Type:** Full-Stack Web Application
+
+---
+
+*Developed as a client project, covering application development, backend implementation, database management, testing, and deployment.*

@@ -1,0 +1,24 @@
+/* Ragen Swim Course — shared accessibility and responsive refinements. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid #0891b2;
+    outline-offset: 3px;
+}
+:where(p, li, td, th, label, .card, .alert) {
+    overflow-wrap: break-word;
+}
+:where(img, video, iframe) { max-width: 100%; }
+:where(button, input, select, textarea) { max-width: 100%; }
+:where(main, section, article) { min-width: 0; }
+@media (max-width: 600px) {
+    :where(input, select, textarea) { font-size: max(16px, 1em); }
+    :where(table) { max-width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html:focus-within { scroll-behavior: auto !important; }
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

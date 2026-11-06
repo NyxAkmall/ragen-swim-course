@@ -74,27 +74,48 @@ class WaitingListService
     /** Admin selects a specific waiting participant; no automatic or FIFO selection. */
     public function offerSelectedByAdmin(int $waitingListId): WaitingList
     {
-        return DB::transaction(function () use ($waitingListId) {
-            $initial = WaitingList::query()->findOrFail($waitingListId);
+	// Read the initial schedule id before opening the transaction.
+	// this prevents an early consistent read from creating
+	// a stale REPEATABLE READ snapshot.
+	$initial = WaitingList::query()
+		->findOrFail($waitingListId);
+
+        return DB::transaction(function () use (
+		$waitingListId,
+		$initial
+	) {
+	    // Lock the schedule as the first query in this transaction.
             $schedule = ClassSchedule::query()
-                ->lockForUpdate()->findOrFail($initial->class_schedule_id);
+                ->lockForUpdate()
+		->findOrFail($initial->class_schedule_id);
             $this->ensureUpcoming($schedule);
             $this->expireOffersLocked($schedule);
 
+	    // Lock and revalidate the selected waiting-list entry.
             $entry = WaitingList::query()
-                ->lockForUpdate()->findOrFail($waitingListId);
-            if ((int) $entry->class_schedule_id !== (int) $schedule->id
-                || $entry->status !== 'waiting') {
-                $this->fail('Peserta ini tidak lagi berada dalam daftar tunggu aktif.');
+                ->lockForUpdate()
+		->findOrFail($waitingListId);
+            if (
+		(int) $entry->class_schedule_id !== (int) $schedule->id
+                || $entry->status !== 'waiting'
+	    ) {
+                $this->fail(
+		    'Peserta ini tidak lagi berada dalam daftar tunggu aktif.'
+		);
             }
+
+	    // Count capacity only after acquiring the schedule lock.
             if ($this->availableSlotsLocked($schedule) <= 0) {
-                $this->fail('Tidak ada slot tersedia untuk ditawarkan.');
+                $this->fail('Tidak ada slot tersedia untuk ditawarkan.'
+		);
             }
 
             $entry->update([
                 'status' => 'offered',
                 'offered_at' => now(),
-                'expires_at' => now()->addMinutes(self::OFFER_DURATION_MINUTES),
+                'expires_at' => now()->addMinutes(
+		    self::OFFER_DURATION_MINUTES
+		),
             ]);
 
             return $entry->refresh();
@@ -140,11 +161,17 @@ class WaitingListService
          */
         $this->refreshQueue((int) $initialEntry->class_schedule_id);
 
-        return DB::transaction(function () use ($waitingListId, $userId, $participantPackageId) {
-            $initialEntry = WaitingList::query()->findOrFail($waitingListId);
+        $scheduleId = (int) $initialEntry->class_schedule_id;
+
+        return DB::transaction(function () use (
+            $waitingListId,
+            $userId,
+            $participantPackageId,
+            $scheduleId
+        ) {
             $schedule = ClassSchedule::query()
                 ->lockForUpdate()
-                ->findOrFail($initialEntry->class_schedule_id);
+                ->findOrFail($scheduleId);
 
             $entry = WaitingList::query()->lockForUpdate()->findOrFail($waitingListId);
             if ((int) $entry->class_schedule_id !== (int) $schedule->id) {
@@ -161,7 +188,12 @@ class WaitingListService
 
             $this->ensureUpcoming($schedule);
             $this->expireOffersLocked($schedule);
-            $entry->refresh();
+
+            // Baca status terbaru dengan locking read.
+            // Hindari refresh() yang dapat menggunakan snapshot lama.
+            $entry = WaitingList::query()
+                ->lockForUpdate()
+                ->findOrFail($waitingListId);
 
             if ($entry->status !== 'offered'
                 || $entry->expires_at === null

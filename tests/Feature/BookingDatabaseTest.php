@@ -13,7 +13,7 @@ class BookingDatabaseTest extends TestCase
 
     public function test_booking_tables_exist(): void
     {
-        $this->assertSame('sqlite', DB::getDriverName());
+        $this->assertSame('mysql', DB::getDriverName());
 
         foreach ([
             'users',
@@ -36,33 +36,31 @@ class BookingDatabaseTest extends TestCase
     public function test_booking_unique_code_index_exists(): void
     {
         $indexes = DB::select(
-            "PRAGMA index_list('bookings')"
+            "SELECT
+                INDEX_NAME AS index_name,
+                NON_UNIQUE AS non_unique,
+                COLUMN_NAME AS column_name,
+                SEQ_IN_INDEX AS seq_in_index
+            FROM information_schema.STATISTICS
+            WHERE TABLE_SCHEMA = DATABASE()
+            AND TABLE_NAME = ?
+            AND NON_UNIQUE = 0
+            ORDER BY INDEX_NAME, SEQ_IN_INDEX",
+            ['bookings']
         );
 
-        $uniqueIndexes = array_filter(
-            $indexes,
-            fn ($index) => (int) $index->unique === 1
-        );
+        $uniqueIndexes = [];
 
-        $found = false;
-
-        foreach ($uniqueIndexes as $index) {
-            $columns = DB::select(
-                "PRAGMA index_info('"
-                . str_replace("'", "''", $index->name)
-                . "')"
-            );
-
-            $names = array_map(
-                fn ($column) => $column->name,
-                $columns
-            );
-
-            if ($names === ['booking_code']) {
-                $found = true;
-                break;
-            }
+        foreach ($indexes as $index) {
+            $uniqueIndexes[$index->index_name][] =
+                $index->column_name;
         }
+
+        $found = in_array(
+            ['booking_code'],
+            array_values($uniqueIndexes),
+            true
+        );
 
         $this->assertTrue(
             $found,
